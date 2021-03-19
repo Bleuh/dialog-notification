@@ -1,9 +1,9 @@
 module.exports = [
   // Add support for native node modules
-  // {
-  //   test: /\.node$/,
-  //   use: 'node-loader',
-  // },
+  {
+    test: /\.node$/,
+    use: 'node-loader',
+  },
   {
     test: /\.(m?js|node)$/,
     parser: { amd: false },
@@ -16,7 +16,7 @@ module.exports = [
   },
   {
     test: /\.tsx?$/,
-    exclude: /(node_modules|\.webpack)/,
+    exclude: /(node_modules|\.webpack|\.functions)/,
     use: {
       loader: 'ts-loader',
       options: {

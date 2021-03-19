@@ -7,10 +7,31 @@ const {
   NOTIFICATION_SERVICE_ERROR,
   NOTIFICATION_RECEIVED,
   TOKEN_UPDATED,
-} = require ('electron-push-receiver/src/constants')
+} = require('electron-push-receiver/src/constants')
+
+document.getElementById('answer').addEventListener('submit', event => {
+  event.preventDefault();
+  ipcRenderer.send("api-call", {
+    data: {
+      "title": (<HTMLInputElement>document.getElementById('answer-title')).value,
+      "body": (<HTMLInputElement>document.getElementById('answer-message')).value,
+      "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Image_created_with_a_mobile_phone.png/250px-Image_created_with_a_mobile_phone.png"
+    },
+    path: '/dialog-notification/us-central1/notifyAll'
+  })
+});
 
 // Listen for service successfully started
 ipcRenderer.on(NOTIFICATION_SERVICE_STARTED, (_, token) => {
+  ipcRenderer.on("api-call", () => {
+    console.log('call done');
+  })
+  ipcRenderer.send("api-call", {
+    data: {
+      token
+    },
+    path: '/dialog-notification/us-central1/addToken'
+  })
   console.log('service successfully started', token)
 })
 
@@ -21,20 +42,34 @@ ipcRenderer.on(NOTIFICATION_SERVICE_ERROR, (_, error) => {
 
 // Send FCM token to backend
 ipcRenderer.on(TOKEN_UPDATED, (_, token) => {
+  ipcRenderer.on("api-call", () => {
+    console.log('call done');
+  })
+  ipcRenderer.send("api-call", {
+    data: {
+      token
+    },
+    path: '/dialog-notification/us-central1/addToken'
+  })
   console.log('token updated', token)
 })
 
 // Display notification
 ipcRenderer.on(NOTIFICATION_RECEIVED, (_, serverNotificationPayload) => {
   // check to see if payload contains a body string, if it doesn't consider it a silent push
-  if (serverNotificationPayload.notification.body){
+  if (serverNotificationPayload.notification) {
     // payload has a body, so show it to the user
     console.log('display notification', serverNotificationPayload)
-    let myNotification = new Notification(serverNotificationPayload.notification.title, {
-      body: serverNotificationPayload.notification.body
+    const { title, body, image } = serverNotificationPayload.notification;
+    document.getElementById('title').innerText = title;
+    document.getElementById('message').innerText = body;
+    let myNotification = new Notification(title, {
+      body,
+      icon: image
     })
 
     myNotification.onclick = () => {
+      ipcRenderer.send("show");
       console.log('Notification clicked')
     }
   } else {

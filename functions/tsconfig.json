@@ -1,15 +1,22 @@
 {
   "compilerOptions": {
+    "allowJs": true,
     "module": "commonjs",
-    "noImplicitReturns": true,
-    "noUnusedLocals": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "noImplicitAny": true,
     "outDir": "lib",
     "sourceMap": true,
     "strict": true,
-    "target": "es2017"
+    "baseUrl": ".",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "target": "es2017",
+    "paths": {
+      "*": ["node_modules/*"]
+    }
   },
-  "compileOnSave": true,
   "include": [
-    "src"
-  ]
+    "./src"
+  ],
 }
