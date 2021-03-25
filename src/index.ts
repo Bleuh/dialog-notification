@@ -1,8 +1,10 @@
 import { app, BrowserWindow, ipcMain, net } from "electron";
 import { setup as setupPushReceiver } from "electron-push-receiver";
+var path = require('path')
 declare const MAIN_WINDOW_WEBPACK_ENTRY: any;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
 
+let userID: string = null;
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require("electron-squirrel-startup")) {
   app.quit();
@@ -13,12 +15,15 @@ const createWindow = (): void => {
   const mainWindow = new BrowserWindow({
     height: 600,
     width: 800,
+    icon: path.join(__dirname, 'assets/ring-bell.png'),
     webPreferences: {
       contextIsolation: true,
       nodeIntegration: false,
       preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
     },
   });
+
+  mainWindow.setMenuBarVisibility(false);
 
   // and load the index.html of the app.
   mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
@@ -34,38 +39,35 @@ const createWindow = (): void => {
         path: string;
       }
     ) => {
+      if (userID === null) {
+        userID = arg.data.token.substring(0,10);
+      }
       const body = JSON.stringify({
         ...arg.data,
+        id: userID
       });
       const request = net.request({
         method: "POST",
-        protocol: "http:",
-        hostname: "127.0.0.1",
-        port: 5001,
+        protocol: process.env.PROTOCOL,
+        hostname: process.env.HOSTNAME,
         path: arg.path,
       });
 
       request.on("response", (response) => {
-        console.log(`STATUS: ${response.statusCode}`);
-        console.log(`HEADERS: ${JSON.stringify(response.headers)}`);
-
         response.on("data", (chunk) => {
-          console.log(`BODY: ${chunk}`);
+          let body = null;
+          try {
+            body = JSON.parse(chunk.toString())
+          } catch (error) {
+            body = { result: chunk.toString() }
+          }
+          even.reply('api-response', {
+            statusCode: response.statusCode,
+            headers: response.headers,
+            body
+          })
         });
       });
-      request.on("finish", () => {
-        console.log("Request is Finished");
-      });
-      request.on("abort", () => {
-        console.log("Request is Aborted");
-      });
-      request.on("error", (error) => {
-        console.log(`ERROR: ${JSON.stringify(error)}`);
-      });
-      request.on("close", () => {
-        console.log("Last Transaction has occured");
-      });
-
       request.setHeader("Content-Type", "application/json");
       request.write(body, "utf-8");
       request.end();
@@ -76,8 +78,14 @@ const createWindow = (): void => {
     mainWindow.show();
   });
 
+  ipcMain.on("get-setup", (event) => {
+    event.reply("setup", {
+      mode: process.env.MODE
+    })
+  })
+
   // Open the DevTools.
-  mainWindow.webContents.openDevTools();
+  // mainWindow.webContents.openDevTools();
 };
 
 // This method will be called when Electron has finished
@@ -90,6 +98,17 @@ app.on("ready", createWindow);
 // explicitly with Cmd + Q.
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
+    const request = net.request({
+      method: "POST",
+      protocol: process.env.PROTOCOL,
+      hostname: process.env.HOSTNAME,
+      path: '/deleteToken',
+    });
+    request.setHeader("Content-Type", "application/json");
+    request.write(JSON.stringify({
+      id: userID
+    }), "utf-8");
+    request.end();
     app.quit();
   }
 });

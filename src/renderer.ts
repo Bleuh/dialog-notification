@@ -9,17 +9,45 @@ const {
   TOKEN_UPDATED,
 } = require('electron-push-receiver/src/constants')
 
+document.getElementById('sender-button').addEventListener('click', event => {
+  event.preventDefault();
+  document.getElementById('selector').style.display = "none";
+  document.getElementById('sender').style.display = "block";
+});
+document.getElementById('receiver-button').addEventListener('click', event => {
+  event.preventDefault();
+  document.getElementById('selector').style.display = "none";
+  document.getElementById('receiver').style.display = "block";
+});
+
 document.getElementById('answer').addEventListener('submit', event => {
   event.preventDefault();
   ipcRenderer.send("api-call", {
     data: {
       "title": (<HTMLInputElement>document.getElementById('answer-title')).value,
-      "body": (<HTMLInputElement>document.getElementById('answer-message')).value,
-      "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Image_created_with_a_mobile_phone.png/250px-Image_created_with_a_mobile_phone.png"
+      "body": (<HTMLInputElement>document.getElementById('answer-message')).value
     },
-    path: '/dialog-notification/us-central1/notifyAll'
+    path: '/notifyAll'
   })
 });
+
+document.getElementById('call-button').addEventListener('click', event => {
+  event.preventDefault();
+  const element = document.getElementById('call-button');
+  element.classList.add("waiting");
+  ipcRenderer.send("api-call", {
+    data: {
+      "title": "Maman",
+      "body": "À table ! Il est l'heure de manger !",
+      "imageUrl": "https://i.pinimg.com/originals/81/8c/9f/818c9fc5fd517fc270f0294dbd53edf5.jpg"
+    },
+    path: '/notifyAll'
+  })
+});
+
+ipcRenderer.on('api-response', (_, response) => {
+  console.log('Response', response)
+})
 
 // Listen for service successfully started
 ipcRenderer.on(NOTIFICATION_SERVICE_STARTED, (_, token) => {
@@ -30,7 +58,7 @@ ipcRenderer.on(NOTIFICATION_SERVICE_STARTED, (_, token) => {
     data: {
       token
     },
-    path: '/dialog-notification/us-central1/addToken'
+    path: '/addToken'
   })
   console.log('service successfully started', token)
 })
@@ -49,7 +77,7 @@ ipcRenderer.on(TOKEN_UPDATED, (_, token) => {
     data: {
       token
     },
-    path: '/dialog-notification/us-central1/addToken'
+    path: '/addToken'
   })
   console.log('token updated', token)
 })
@@ -61,8 +89,12 @@ ipcRenderer.on(NOTIFICATION_RECEIVED, (_, serverNotificationPayload) => {
     // payload has a body, so show it to the user
     console.log('display notification', serverNotificationPayload)
     const { title, body, image } = serverNotificationPayload.notification;
-    document.getElementById('title').innerText = title;
-    document.getElementById('message').innerText = body;
+    document.getElementById('sender-title').innerText = title;
+    document.getElementById('sender-text').innerText = body;
+    document.getElementById('receiver-title').innerText = title;
+    document.getElementById('receiver-text').innerText = body;
+    const element = document.getElementById('call-button');
+    element.classList.remove("waiting");
     let myNotification = new Notification(title, {
       body,
       icon: image

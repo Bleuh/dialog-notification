@@ -1,21 +1,35 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta charset="UTF-8">
-    <title>Hello World!</title>
+    <meta charset="UTF-8" />
+    <title>Dialog notification</title>
   </head>
   <body>
-    <div>
-      <h2 id="title">Message de maman</h2>
-      <p id="message">ici</p>
-    </div>
-    <div>
+    <section id="selector">
+      <button id="sender-button">Emeteur</button>
+      <button id="receiver-button">Receveur</button>
+    </section>
+    <section id="sender">
+      <section>
+        <button id="call-button">À table</button>
+      </section>
+      <section id="sender-message">
+        <h2 id="sender-title">Bastien</h2><span id="title-span">:</span>
+        <p id="sender-text">...</p>
+      </section>
+    </section>
+    <section id="receiver">
+      <section>
+        <h2 id="receiver-title">Message de maman :</h2>
+        <div id="receiver-text">message</div>
+      </section>
       <h2>Réponse</h2>
       <form id="answer" action="#">
-        <input id="answer-title" type="text" placeholder="titre" name="title">
-        <input id="answer-message" type="text" placeholder="message" name="message">
-        <input type="submit" value="Envoyer">
+        <input id="answer-title" type="text" placeholder="titre" name="title" value="Bastien" />
+        <input id="answer-message" type="text" placeholder="message" name="message" />
+        <input type="submit" value="Envoyer" />
       </form>
-    </div>
+    </section>
+    <section></section>
   </body>
 </html>

@@ -1,3 +1,4 @@
+const Dotenv = require('dotenv-webpack');
 const CopyPlugin = require("copy-webpack-plugin");
 
 module.exports = {
@@ -11,6 +12,7 @@ module.exports = {
     rules: require('./webpack.rules'),
   },
   plugins: [
+    new Dotenv(),
     new CopyPlugin({
       patterns: [
         {
