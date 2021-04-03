@@ -22,6 +22,9 @@ document.getElementById('receiver-button').addEventListener('click', event => {
 
 document.getElementById('answer').addEventListener('submit', event => {
   event.preventDefault();
+  document.getElementById('receiver-title').innerText = "En attente";
+  document.getElementById('receiver-text').innerText = "";
+  document.getElementById('call-message').classList.remove("waiting");
   ipcRenderer.send("api-call", {
     data: {
       "title": (<HTMLInputElement>document.getElementById('answer-title')).value,
@@ -93,6 +96,7 @@ ipcRenderer.on(NOTIFICATION_RECEIVED, (_, serverNotificationPayload) => {
     document.getElementById('sender-text').innerText = body;
     document.getElementById('receiver-title').innerText = title;
     document.getElementById('receiver-text').innerText = body;
+    document.getElementById('call-message').classList.add("waiting");
     const element = document.getElementById('call-button');
     element.classList.remove("waiting");
     let myNotification = new Notification(title, {

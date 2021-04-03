@@ -20,6 +20,14 @@ module.exports = {
           to: "native_modules/[name].[ext]",
         }
       ]
+    }),
+    new CopyPlugin({
+      patterns: [
+        {
+          from: "./src/assets/**/*",
+          to: "assets/[name].[ext]",
+        }
+      ]
     })
   ],
   resolve: {

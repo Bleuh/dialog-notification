@@ -13,22 +13,34 @@
       <section>
         <button id="call-button">À table</button>
       </section>
-      <section id="sender-message">
-        <h2 id="sender-title">Bastien</h2><span id="title-span">:</span>
+      <section class="sender-message">
+        <h2 class="sender-title" id="sender-title">Bastien</h2>
+        <span class="title-span">:</span>
         <p id="sender-text">...</p>
       </section>
     </section>
     <section id="receiver">
-      <section>
-        <h2 id="receiver-title">Message de maman :</h2>
-        <div id="receiver-text">message</div>
+      <section id="call-message">
+        <h2 id="receiver-title">En attente</h2>
+        <div id="receiver-text"></div>
       </section>
-      <h2>Réponse</h2>
-      <form id="answer" action="#">
-        <input id="answer-title" type="text" placeholder="titre" name="title" value="Bastien" />
-        <input id="answer-message" type="text" placeholder="message" name="message" />
-        <input type="submit" value="Envoyer" />
-      </form>
+      <section class="sender-message center">
+        <h2 class="sender-title">Réponse</h2>
+        <span class="title-span">:</span>
+        <form id="answer" action="#">
+          <div class="form-input">
+            <div class="answer-div">
+              <label for="answer-title">Nom:</label>
+              <input id="answer-title" type="text" placeholder="titre" name="title" value="Bastien" />
+            </div>
+            <div class="answer-div">
+              <label for="answer-message">Message:</label>
+              <textarea id="answer-message" name="message">J'arrive !</textarea>
+            </div>
+          </div>
+          <input id="answer-submit" type="submit" value="Envoyer" />
+        </form>
+      </section>
     </section>
     <section></section>
   </body>
